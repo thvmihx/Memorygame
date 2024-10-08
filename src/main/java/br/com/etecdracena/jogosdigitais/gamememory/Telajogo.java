@@ -4,30 +4,33 @@
  */
 package br.com.etecdracena.jogosdigitais.gamememory;
 
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  *
  * @author 23011
  */
-public class Telajogo extends javax.swing.JFrame implements ActionListener{
-    
-    private Object botaoPrimeiroSelecionado, botaoSelecionado;
-    private JLabel jogadorpontos;
+public class Telajogo extends javax.swing.JFrame implements ActionListener {
+
+    private Object botaoPrimeiroSelecionado, botaoSegundoSelecionado;
+    private JLabel jogadorPontos;
     private Icon imagens[];
-    private  Container container;
+    private Container container;
     private String tema;
     private Integer fator, acertos, tentativas;
     private boolean primeiroSelecionado = true;
     private boolean acertou = true;
     private jogoBotao primeiroBotao, segundoBotao, imagensBotao[];
     private Jogador jogador;
-    
 
     /**
      * Creates new form Telajogo
@@ -95,33 +98,96 @@ public class Telajogo extends javax.swing.JFrame implements ActionListener{
             }
         });
     }
-    
+
     // Codigo do jogo inicia aqui
-    
-    private void escolhaTema(Integer tema){
+    private void escolhaTema(Integer tema) {
         switch (tema) {
             case 1:
                 this.tema = "imagens/temas/onepiece/";
-                
+
                 break;
         }
     }
-    
-    private void resumojogo(){
+
+    private void resumojogo() {
         StringBuilder resumo = new StringBuilder();
         resumo.append("Jogador:").append(jogador.pegaNome()).append("\n\n");
         resumo.append("Pontos:").append(jogador.obterPontos()).append("\n\n");
         resumo.append("Tentativas:").append("\n\n");
-        
-        JOptionPane.showMassageDialog(null, resumo.toString(), "Resumo do jogo", JOptionPane.INFORMATION_MESSAGE);
+
+        JOptionPane.showMessageDialog(null, resumo.toString(), "Resumo do jogo", JOptionPane.INFORMATION_MESSAGE);
         setVisible(false);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    private JPanel painelImagens() {
+        JPanel painel = new JPanel();
+        GridLayout grid = new GridLayout(fator, fator, 5, 5);
+        painel.setLayout(grid);
+
+        int resultFator = fator * fator;
+        imagensBotao = new jogoBotao[resultFator];
+
+        for (int cont = 0; cont < resultFator; cont++) {
+            imagensBotao[cont] = new jogoBotao(inserirImagemPadrao(), imagens[cont]);
+            imagensBotao[cont].addActionListener(this);
+            painel.add(imagensBotao[cont]);
+
+        }
+        return painel;
     }
 
+    private Icon inserirImagemPadrao() {
+        Icon imagemPadrao = new ImageIcon(getClass().getClassLoader()
+                .getResource(tema + "fundo.jpg"));
+        return imagemPadrao;
+    }
+
+    private JPanel paineljogador() {
+        jogadorPontos = new JLabel("jogador:" + jogador.pegaNome() + "Pontos:" + jogador.obterPontos());
+        JPanel painel = new JPanel();
+        painel.setBackground(Color.white);
+        painel.add(jogadorPontos);
+        return painel;
+    }
+
+    private void preparaImagens() {
+        Integer posicaoArray, x, y;
+        Integer resultFator = (fator * fator) / 2;
+        this.imagens = new Icon[resultFator];
+        for (x = 0; x < resultFator; x++) {
+            this.imagens[x] = new ImageIcon(getClass()
+                    .getClassLoader().getResource(tema + (x + 1) + ".png"));
+        }
+        this.imagens = new Icon[resultFator];
+
+        for (x = 0; x < 2; x++) {
+            for (y = 0; y < resultFator; y++) {
+                do {
+                    posicaoArray = (int) Math.random() * resultFator;
+                } while (this.imagens[posicaoArray] != null);
+                this.imagens[posicaoArray] = imagens[y];
+            }
+        }
+    }
+
+    @Override                                     
+    public void actionPerformed(ActionEvent event) {
+        if (primeiroSelecionado) {
+            tentativas++;
+            if (!acertou) {
+                primeiroBotao = (jogoBotao) botaoPrimeiroSelecionado;
+                segundoBotao = (jogoBotao) botaoSegundoSelecionado;
+
+                primeiroBotao.setImagemPadrao();
+                segundoBotao.setImagemPadrao();
+            }
+            botaoPrimeiroSelecionado = event.getSource();
+            
+            primeiroBotao = (jogoBotao) botaoPrimeiroSelecionado;
+            primeiroBotao.setImagemBotao();
+            primeiroSelecionado = !primeiroSelecionado;
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 }
